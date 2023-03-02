@@ -11,10 +11,11 @@ const run = async () => {
     fs.readFile(path.join(__dirname, "../certificates/cert.pem")),
     fs.readFile(path.join(__dirname, "../certificates/key.pem"))
   ]);
+  const port = 3000;
 
   const server = new Server();
   console.log("Starting Server...");
-  await server.start(certificate, key, 3000);
+  await server.start(certificate, key, port);
   console.log("Server Started.");
 }
 

@@ -17,6 +17,10 @@ export class Game {
     this.name = name;
   }
 
+  public listGamePlayers(){
+    return this.players.map(player => player.name);
+  }
+
   public getState(){
     return {
       name: this.name,

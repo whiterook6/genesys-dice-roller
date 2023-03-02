@@ -1,3 +1,4 @@
+// individual faces
 export const SUCCESS = "success";
 export const FAILURE = "failure";
 export const ADVANTAGE = "advantage";
@@ -8,8 +9,7 @@ export const BLANK = "blank";
 export type Face = "success" | "failure" | "advantage" | "threat" | "triumph" | "despair" | "blank";
 export const FaceNames: Face[] = [SUCCESS, FAILURE, ADVANTAGE, THREAT, TRIUMPH, DESPAIR, BLANK];
 
-export type Roll = Face[];
-
+// dice: double arrays of faces
 export type Die = Face[][];
 export type Dice = Die[];
 export const ABILITY = "ability";
@@ -21,8 +21,9 @@ export const DIFFICULTY = "difficulty";
 export type DiceName = "ability" | "boost" | "proficiency" | "setback" | "challenge" | "difficulty";
 export const DiceNames = [ABILITY, BOOST, PROFICIENCY, SETBACK, CHALLENGE, DIFFICULTY];
 
+// dice definitions
 export const DICE: {[key: string]: Die} = {
-  ABILITY: [
+  ABILITY: [ // green d8
     [BLANK],
     [SUCCESS],
     [SUCCESS],
@@ -32,7 +33,7 @@ export const DICE: {[key: string]: Die} = {
     [ADVANTAGE, ADVANTAGE],
     [SUCCESS, SUCCESS]
   ],
-  BOOST: [
+  BOOST: [ // blue d6
     [BLANK],
     [BLANK],
     [SUCCESS],
@@ -40,7 +41,7 @@ export const DICE: {[key: string]: Die} = {
     [ADVANTAGE, SUCCESS],
     [ADVANTAGE, ADVANTAGE],
   ],
-  PROFICIENCY: [
+  PROFICIENCY: [ // yellow d12
     [BLANK],
     [TRIUMPH],
     [SUCCESS],
@@ -54,7 +55,7 @@ export const DICE: {[key: string]: Die} = {
     [SUCCESS, SUCCESS],
     [SUCCESS, SUCCESS]
   ],
-  SETBACK: [
+  SETBACK: [ // black d6
     [BLANK],
     [BLANK],
     [FAILURE],
@@ -62,7 +63,7 @@ export const DICE: {[key: string]: Die} = {
     [THREAT],
     [THREAT],
   ],
-  CHALLENGE: [
+  CHALLENGE: [ // purple d12
     [BLANK],
     [FAILURE],
     [THREAT],
@@ -72,7 +73,7 @@ export const DICE: {[key: string]: Die} = {
     [FAILURE, THREAT],
     [THREAT, THREAT],
   ],
-  DIFFICULTY: [
+  DIFFICULTY: [ // red d12
     [BLANK],
     [DESPAIR],
     [FAILURE],
@@ -88,12 +89,20 @@ export const DICE: {[key: string]: Die} = {
   ]
 };
 
+export const EASY_CHALLENGE = [CHALLENGE];
+export const AVERAGE_CHALLENGE = [CHALLENGE, CHALLENGE];
+export const HARD_CHALLENGE = [CHALLENGE, CHALLENGE, CHALLENGE];
+
+// a roll of dice results in some faces
+export type Roll = Face[];
+
 export const roll = (diceNames: DiceName[]): Roll => {
   const dice = diceNames.map(diceName => DICE[diceName]);
   const roll = dice.flatMap(die => die[Math.floor(Math.random() * die.length)]);
   return roll;
 };
 
+// subtract failures from successes, threats from advantages, and add triumphs and despairs
 export const summarize = (roll: Roll): Roll => {
   const successes = roll.filter(face => face === SUCCESS).length - roll.filter(face => face === FAILURE).length;
   const advantages = roll.filter(face => face === ADVANTAGE).length - roll.filter(face => face === THREAT).length;

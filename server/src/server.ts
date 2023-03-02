@@ -6,6 +6,8 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { Player } from "./player";
 import { DiceName } from "./dice";
+import { param } from "express-validator";
+import { validate } from "./validation";
 
 export class Server {
   games: Game[] = [];
@@ -13,19 +15,46 @@ export class Server {
 
   constructor(){
     this.app = express();
+
     this.app.use(helmet());
     this.app.use(cors());
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({extended: false}));
 
-    this.app.get("/games", this.listGames.bind(this));
-    this.app.get("/games/:game", this.getGame.bind(this));
-    this.app.get("/games/:game/players", this.listGamePlayers.bind(this));
-    this.app.get("/games/:game/turns", this.listGameTurns.bind(this));
-    this.app.get("/games/:game/join", this.join.bind(this));
+    this.app.get(
+      "/games",
+      this.listGames.bind(this)
+    );
+    this.app.get(
+      "/games/:game",
+      [param("game").isString().isLength({min:1}), validate],
+      this.getGame.bind(this)
+    );
+    this.app.get(
+      "/games/:game/players",
+      [param("game").isString().isLength({min:1}), validate],
+      this.listGamePlayers.bind(this)
+    );
+    this.app.get(
+      "/games/:game/turns",
+      [param("game").isString().isLength({min:1}), validate],
+      this.listGameTurns.bind(this)
+    );
+    this.app.get(
+      "/games/:game/join",
+      [param("game").isString().isLength({min:1}), validate],
+      this.join.bind(this)
+    );
 
-    this.app.post("/games", this.createGame.bind(this));
-    this.app.post("/games/:game/turns", this.takeTurn.bind(this));
+    this.app.post(
+      "/games",
+      this.createGame.bind(this)
+    );
+    this.app.post(
+      "/games/:game/turns",
+      [param("game").isString().isLength({min:1}), validate],
+      this.takeTurn.bind(this)
+    );
   }
 
   async listGames(_: Request, response: Response){
@@ -49,7 +78,7 @@ export class Server {
       return response.status(404).send(`Game ${name} not found.`);
     }
 
-    return response.status(200).json(game.players.map(player => player.name));
+    return response.status(200).json(game.listGamePlayers());
   }
 
   async listGameTurns(request: Request, response: Response){
