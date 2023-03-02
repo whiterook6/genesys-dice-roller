@@ -1,5 +1,7 @@
-import { Game, Turn } from "./game";
+import { Game } from "./game";
 import express, {Express, Request, Response } from "express";
+import {createServer as createHttps} from "https";
+import helmet from "helmet";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { Player } from "./player";
@@ -11,6 +13,7 @@ export class Server {
 
   constructor(){
     this.app = express();
+    this.app.use(helmet());
     this.app.use(cors());
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({extended: false}));
@@ -126,11 +129,13 @@ export class Server {
     response.send("Hello World");
   };
 
-  async start(port: number): Promise<Express>{
+  async start(certificate: Buffer, key: Buffer, port: number): Promise<void>{
     return new Promise(resolve => {
-      this.app.listen(port, () => {
-        resolve(this.app);
-      });
+      const options = {
+        key,
+        cert: certificate
+      };
+      createHttps(options, this.app).listen(port, resolve);
     });
   }
 }
