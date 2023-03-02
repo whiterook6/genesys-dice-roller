@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "rm -rf dist;esbuild src/index.tsx --bundle --outfile=dist/index.js --minify --sourcemap;cp src/index.html dist/index.html"
+    "build": "rm -rf ../public;esbuild src/index.tsx --bundle --outfile=../public/index.js --minify --sourcemap;cp src/index.html ../public/index.html"
   },
   "name": "typescript-preact-rollup",
   "version": "1.0.0",
@@ -9,6 +9,7 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
+    "bulma": "^0.9.4",
     "preact": "^10.10.6"
   },
   "devDependencies": {

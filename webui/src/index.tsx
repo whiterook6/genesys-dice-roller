@@ -1,9 +1,5 @@
 import {render} from "preact";
-
-const App = () => (
-    <div>
-        <h1>Hello, world!</h1>
-    </div>
-);
+import "bulma/css/bulma.css";
+import {App} from "./App";
 
 render(<App />, document.body);

@@ -8,6 +8,7 @@ import { Player } from "./player";
 import { DiceName } from "./dice";
 import { param } from "express-validator";
 import { validate } from "./validation";
+import path from "path";
 
 export class Server {
   games: Game[] = [];
@@ -55,6 +56,11 @@ export class Server {
       [param("game").isString().isLength({min:1}), validate],
       this.takeTurn.bind(this)
     );
+
+    this.app.use("/assets", express.static(path.join(__dirname, "../../public")));
+    this.app.use("/*", (_, response) => {
+      response.sendFile(path.join(__dirname, "../../public/index.html"));
+    });
   }
 
   async listGames(_: Request, response: Response){
