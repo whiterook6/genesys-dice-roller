@@ -30,9 +30,12 @@ export const getTurns = async (name: string) => {
   return response.json() as Promise<any>;
 };
 
-export const startGame = async (name: string) => {
-  const response = await fetch(`/games/${name}/start`, {
+export const createGame = async (name: string) => {
+  const response = await fetch(`/games`, {
     method: "POST",
+    body: JSON.stringify({
+      name,
+    }),
   });
   await checkResponse(response);
   return response.json() as Promise<any>;

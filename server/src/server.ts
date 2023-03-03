@@ -105,7 +105,7 @@ export class Server {
 
     const game = new Game(name);
     this.games.push(game);
-    response.status(200).send();
+    response.status(200).send(game.getState());
   }   
 
   async join(request: Request, response: Response){
