@@ -1,4 +1,5 @@
 import { Component, createContext } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 interface IServerEventsContext {
   events: any[];
@@ -12,77 +13,48 @@ export const ServerEventsContext = createContext<IServerEventsContext>({
 });
 
 interface Props {
-  game: string;
+  game?: string;
+  children: any;
 }
 
 interface State {
   events: any[];
-  error?: Error;
 }
 
-export class ServerEventsProvider extends Component<Props, State> {
-  eventSource: EventSource;
-  constructor(props: Props){
-    super(props);
-    this.state = {
-      events: []
+export const ServerEventsProvider = ({game, children}: Props) => {
+  const [state, setState] = useState<State>({events: []});
+  const ref = useRef<EventSource>();
+  useEffect(() => {
+    if (ref.current){
+      ref.current.close();
+      setState({events: []});
+    }
+
+    const source = new EventSource(`/api/games/${game}/events`);
+    source.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setState(oldState => ({
+        ...oldState,
+        events: [...oldState.events, data]
+      }));
     };
-
-    this.eventSource = new EventSource(`/api/game/${props.game}/events`);
-    this.addListener();
-  }
-
-  componentDidUpdate(previousProps: Readonly<Props>): void {
-    if (previousProps.game !== this.props.game) {
-      this.eventSource.close();
-      this.eventSource = new EventSource(`/api/game/${this.props.game}/events`);
-      this.setState({
-        events: []
-      });
-      this.addListener();
-    }    
-  }
-
-  public addListener = () => {
-    if (!this.eventSource){
-      return;
-    }
-
-    if (!this.eventSource.OPEN){
-      return;
-    }
     
-    this.eventSource.onmessage = (message) => {
-      this.addEvent(JSON.parse(message.data));
-    };
-
-    this.eventSource.onerror = (error: Event) => {
-      this.setState({
-        error: new Error(error.type)
-      });
+    ref.current = source;
+    return () => {
+      ref.current.close();
     }
+  }, [game]);
+
+  const clearEvents = () => {
+    setState({events: []});
   }
 
-  public addEvent = (event: any) => {
-    this.setState({
-      events: [...this.state.events, event].slice(-100)
-    });
-  }
-
-  public clearEvents = () => {
-    this.setState({
-      events: []
-    });
-  }
-
-  public render = () => {
-    return (
-      <ServerEventsContext.Provider value={{
-        events: this.state.events,
-        clearEvents: this.clearEvents
-      }}>
-        {this.props.children}
-      </ServerEventsContext.Provider>
-    )
-  }
+  return (
+    <ServerEventsContext.Provider value={{
+      events: state.events,
+      clearEvents
+    }}>
+      {children}
+    </ServerEventsContext.Provider>
+  );
 }

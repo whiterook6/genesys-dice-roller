@@ -12,13 +12,40 @@ interface Props {
   onCreate: (name: string) => void;
 }
 
+interface State {
+  newGameName: string;
+  newPlayerName: string;
+}
+
 export const Lobby = ({onJoin, onCreate}: Props) => {
   const {games, isLoading, loadGames, error} = useContext(GamesContext);
 
-  const [newName, setNewName] = useState<string>("");
-  const onNewNameInput = (e: {currentTarget: {value: string}}) => setNewName(e.currentTarget.value);
-  const canCreate = !isLoading && newName.length > 0 && !games.includes(newName);
-  const onCreateClick = () => onCreate(newName);
+  const [{newGameName, newPlayerName}, setState] = useState<State>({
+    newGameName: "",
+    newPlayerName: ""
+  });
+  const onNewPlayerNameInput = (e: {currentTarget: {value: string}}) => {
+    setState(oldState => {
+      return {
+        ...oldState,
+        newPlayerName: e.currentTarget.value
+      }
+    })
+  };
+  const onNewGameNameInput = (e: {currentTarget: {value: string}}) => {
+    setState(oldState => {
+      return {
+        ...oldState,
+        newGameName: e.currentTarget.value
+      }
+    })
+  };
+  const canCreate = !isLoading && newGameName.length > 0 && !games.includes(newGameName);
+  const onCreateClick = () => {
+    if (canCreate){
+      onCreate(newGameName);
+    }
+  };
   
   const [view, setView] = useState<View>(View.BROWSE);
   const setJoinView = () => setView(View.BROWSE);
@@ -59,7 +86,7 @@ export const Lobby = ({onJoin, onCreate}: Props) => {
                     <input class="input" type="text" value={newName} onInput={onNewNameInput} placeholder="Game Name" />
                   </div>
                   <div class="control">
-                    <button class="button" onClick={onCreateClick} disabled={!canCreate}>
+                    <button class="button is-primary" onClick={onCreateClick} disabled={!canCreate}>
                       Create
                     </button>
                   </div>

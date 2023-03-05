@@ -1,7 +1,9 @@
 import { Component, ComponentChildren, createRef, RefObject } from "preact";
+
 interface Props {
   children: ComponentChildren;
 }
+
 interface State {
   height: number;
 }
@@ -28,7 +30,7 @@ export class AutoHeight extends Component<Props, State> {
     }
     
     const desiredHeight = this.contentRef.current.clientHeight;
-    if (Math.abs(desiredHeight - this.state.height) > 1) {
+    if (Math.abs(desiredHeight - this.state.height) >= 1) {
       this.setState({
         height: desiredHeight
       });
