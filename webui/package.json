@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build": "rm -rf ../public;esbuild src/index.tsx --bundle --outfile=../public/index.js --minify --sourcemap;cp src/index.html ../public/index.html"
+    "build": "rm -rf ../public;esbuild src/index.tsx --bundle --outfile=../public/index.js --minify --sourcemap;cp src/index.html ../public/index.html",
+    "watch": "esbuild src/index.tsx --bundle --outfile=../public/index.js --minify --sourcemap --watch"
   },
   "name": "typescript-preact-rollup",
   "version": "1.0.0",

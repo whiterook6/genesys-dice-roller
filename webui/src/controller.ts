@@ -1,56 +1,65 @@
-const checkResponse = async (response: Response) => {
-  if (response.ok) {
-    return;
+export class Controller {
+  public listGames = async () => {
+    const response = await fetch("/games");
+    await this.checkResponse(response);
+    return response.json() as Promise<string[]>;
   }
-  const error = await response.json();
-  throw new Error(error.message);
-};
 
-export const listGames = async () => {
-  const response = await fetch("/games");
-  await checkResponse(response);
-  return response.json() as Promise<string[]>;
-};
+  public getGame = async (name: string) => {
+    const response = await fetch(`/games/${name}`);
+    await this.checkResponse(response);
+    return response.json() as Promise<any>;
+  }
 
-export const getGame = async (name: string) => {
-  const response = await fetch(`/games/${name}`);
-  await checkResponse(response);
-  return response.json() as Promise<any>;
-};
+  public getPlayers = async (name: string) => {
+    const response = await fetch(`/games/${name}/players`);
+    await this.checkResponse(response);
+    return response.json() as Promise<any>;
+  };
 
-export const getPlayers = async (name: string) => {
-  const response = await fetch(`/games/${name}/players`);
-  await checkResponse(response);
-  return response.json() as Promise<any>;
-};
+  public getTurns = async (name: string) => {
+    const response = await fetch(`/games/${name}/turns`);
+    await this.checkResponse(response);
+    return response.json() as Promise<any>;
+  };
 
-export const getTurns = async (name: string) => {
-  const response = await fetch(`/games/${name}/turns`);
-  await checkResponse(response);
-  return response.json() as Promise<any>;
-};
+  public createGame = async (name: string) => {
+    const response = await fetch(`/games`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+      }),
+    });
+    await this.checkResponse(response);
+    return response.json() as Promise<any>;
+  };
 
-export const createGame = async (name: string) => {
-  const response = await fetch(`/games`, {
-    method: "POST",
-    body: JSON.stringify({
-      name,
-    }),
-  });
-  await checkResponse(response);
-  return response.json() as Promise<any>;
-};
+  public takeTurn = async (name: string, dice: string[]) => {
+    const response = await fetch(`/games/${name}/turn`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        dice
+      }),
+    });
+    await this.checkResponse(response);
+    return response.json() as Promise<any>;
+  };
 
-export const takeTurn = async (name: string, dice: string[]) => {
-  const response = await fetch(`/games/${name}/turn`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      dice
-    }),
-  });
-  await checkResponse(response);
-  return response.json() as Promise<any>;
+  private checkResponse = async (response: Response) => {
+    if (response.ok) {
+      return;
+    }
+    try {
+      const error = await response.json();
+      throw new Error(error.message);
+    } catch (e) {
+      throw new Error(response.statusText);
+    }
+  };
 }

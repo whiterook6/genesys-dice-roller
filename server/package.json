@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "license": "UNLICENSED",
   "scripts": {
-    "start:dev": "ts-node -T src/index.ts",
-    "watch:dev": "nodemon"
+    "start": "ts-node -T src/index.ts",
+    "watch": "nodemon"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",

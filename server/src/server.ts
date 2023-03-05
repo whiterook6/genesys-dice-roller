@@ -105,7 +105,8 @@ export class Server {
 
     const game = new Game(name);
     this.games.push(game);
-    response.status(200).send(game.getState());
+    console.log(`Game created: ${name}`);
+    return response.status(200).send(game.getState());
   }   
 
   async join(request: Request, response: Response){
@@ -131,11 +132,16 @@ export class Server {
     });
 
     request.on("close", () => {
-      console.log(`Player ${player.name} left the game.`);
+      console.log(`Player ${player.name} left ${gameName}.`);
       const game = this.games.find(game => game.name === gameName);
       if (game){
         game.players = game.players.filter(player => player.name !== playerName);
         game.broadcast({type: "playerLeft", player: playerName});
+
+        if (game.players.length === 0){
+          this.games = this.games.filter(game => game.name !== gameName);
+          console.log(`Game ${gameName} deleted.`);
+        }
       }
     });
   }

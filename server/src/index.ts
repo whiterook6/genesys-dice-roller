@@ -17,7 +17,7 @@ const run = async () => {
   console.log("Starting Server...");
   await server.start(certificate, key, port);
   console.log("Server Started.");
-}
+};
 
 run().catch((error) => {
   console.error(error);

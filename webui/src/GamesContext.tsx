@@ -1,5 +1,5 @@
 import { Component, createContext } from "preact";
-import { listGames, createGame } from "./controller";
+import { Controller } from "./Controller";
 
 interface IGamesContext {
   games: string[];
@@ -44,7 +44,7 @@ export class GamesProvider extends Component<any, IGamesContext>{
       return;
     }
 
-    const promise = listGames();
+    const promise = new Controller().listGames();
     this.setState({
       isLoading: true,
       promise
@@ -84,7 +84,7 @@ export class GamesProvider extends Component<any, IGamesContext>{
       return;
     }
 
-    await createGame(name);
+    await new Controller().createGame(name);
     return this.loadGames();
   }
   
