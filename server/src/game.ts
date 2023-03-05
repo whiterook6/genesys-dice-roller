@@ -10,11 +10,13 @@ export interface Turn {
 
 export class Game {
   name: string;
+  created: Date;
   players: Player[] = [];
   turns: Turn[] = [];
 
-  constructor(name: string){
+  constructor(name: string, created: Date = new Date()){
     this.name = name;
+    this.created = created;
   }
 
   public listGamePlayers(){
@@ -25,7 +27,8 @@ export class Game {
     return {
       name: this.name,
       players: this.players.map(player => player.getState()),
-      turns: this.turns.slice(-10)
+      turns: this.turns.slice(-10),
+      created: this.created.toISOString()
     }
   }
 

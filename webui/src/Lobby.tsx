@@ -8,30 +8,24 @@ enum View {
 };
 
 interface Props {
-  onJoin: (name: string) => void;
-  onCreate: (name: string) => void;
+  onJoin: (game: string) => void;
+  onCreate: (game: string) => void;
 }
 
 interface State {
   newGameName: string;
-  newPlayerName: string;
 }
 
 export const Lobby = ({onJoin, onCreate}: Props) => {
   const {games, isLoading, loadGames, error} = useContext(GamesContext);
-
-  const [{newGameName, newPlayerName}, setState] = useState<State>({
-    newGameName: "",
-    newPlayerName: ""
+  const [{newGameName}, setState] = useState<State>({
+    newGameName: ""
   });
-  const onNewPlayerNameInput = (e: {currentTarget: {value: string}}) => {
-    setState(oldState => {
-      return {
-        ...oldState,
-        newPlayerName: e.currentTarget.value
-      }
-    })
-  };
+  
+  const [view, setView] = useState<View>(View.BROWSE);
+  const setJoinView = () => setView(View.BROWSE);
+  const setCreateView = () => setView(View.CREATE);
+
   const onNewGameNameInput = (e: {currentTarget: {value: string}}) => {
     setState(oldState => {
       return {
@@ -40,16 +34,14 @@ export const Lobby = ({onJoin, onCreate}: Props) => {
       }
     })
   };
-  const canCreate = !isLoading && newGameName.length > 0 && !games.includes(newGameName);
+  const canCreate = !isLoading
+    && newGameName.length > 0
+    && !games.includes(newGameName);
   const onCreateClick = () => {
     if (canCreate){
       onCreate(newGameName);
     }
   };
-  
-  const [view, setView] = useState<View>(View.BROWSE);
-  const setJoinView = () => setView(View.BROWSE);
-  const setCreateView = () => setView(View.CREATE);
 
   return (
     <div class="section">
@@ -70,20 +62,39 @@ export const Lobby = ({onJoin, onCreate}: Props) => {
               <>
                 <button class={isLoading ? "button is-loading" : "button"} disabled={isLoading} onClick={loadGames}>Refresh</button>
                 {error && <div>Error: {error}</div>}
-                <ul>
-                  {games.map((name) => (
-                    <li key={name}>
-                      <button class="button" onClick={() => onJoin(name)}>{name}</button>
-                    </li>
-                  ))}
-                </ul>
+                {games.length === 0 && <div>No games found. Create one?</div>}
+                {games.length > 0 && (
+                  <table class="table is-striped is-hoverable is-fullwidth">
+                    <colgroup>
+                      <col width="100%" />
+                      <col />
+                    </colgroup>
+                    <thead>
+                      <tr>
+                        <th colSpan={2}>Games</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {games.map((game, index) => (
+                        <tr key={`${index}-${game}`}>
+                          <td>{game}</td>
+                          <td>
+                            <button class="button is-primary" onClick={() => onJoin(game)}>
+                              Join
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </>
             )}
             {view === View.CREATE && (
               <>
                 <div class="field is-grouped">
                   <div class="control is-expanded">
-                    <input class="input" type="text" value={newName} onInput={onNewNameInput} placeholder="Game Name" />
+                    <input class="input" type="text" value={newGameName} onInput={onNewGameNameInput} placeholder="Game Name" />
                   </div>
                   <div class="control">
                     <button class="button is-primary" onClick={onCreateClick} disabled={!canCreate}>
