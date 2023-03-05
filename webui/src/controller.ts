@@ -1,6 +1,13 @@
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export class Controller {
   public listGames = async () => {
-    const response = await fetch("/games");
+    const [
+      response
+    ] = await Promise.all([
+       fetch("/games"),
+       sleep(250)
+    ]);
     await this.checkResponse(response);
     return response.json() as Promise<string[]>;
   }

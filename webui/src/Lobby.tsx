@@ -1,4 +1,5 @@
 import { useContext, useState } from "preact/hooks";
+import { AutoHeight } from "./components/AutoHeight";
 import { GamesContext } from "./GamesContext";
 
 enum View {
@@ -24,32 +25,50 @@ export const Lobby = ({onJoin, onCreate}: Props) => {
   const setCreateView = () => setView(View.CREATE);
 
   return (
-    <div>
-      <h1>Lobby</h1>
-      <div>
-        <button onClick={setJoinView}>Browse Games</button>
-        <button onClick={setCreateView}>Create Game</button>
+    <div class="section">
+      <div class="container">
+        <div class="box">
+          <AutoHeight>
+            <div class="tabs">
+              <ul>
+                <li class={view === View.BROWSE ? "is-active" : ""} onClick={setJoinView}>
+                  <a>Join Game</a>
+                </li>
+                <li class={view === View.CREATE ? "is-active" : ""} onClick={setCreateView}>
+                  <a>Create Game</a>
+                </li>
+              </ul>
+            </div>
+            {view === View.BROWSE && (
+              <>
+                <button class={isLoading ? "button is-loading" : "button"} disabled={isLoading} onClick={loadGames}>Refresh</button>
+                {error && <div>Error: {error}</div>}
+                <ul>
+                  {games.map((name) => (
+                    <li key={name}>
+                      <button class="button" onClick={() => onJoin(name)}>{name}</button>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {view === View.CREATE && (
+              <>
+                <div class="field is-grouped">
+                  <div class="control is-expanded">
+                    <input class="input" type="text" value={newName} onInput={onNewNameInput} placeholder="Game Name" />
+                  </div>
+                  <div class="control">
+                    <button class="button" onClick={onCreateClick} disabled={!canCreate}>
+                      Create
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </AutoHeight>
+        </div>
       </div>
-      {view === View.BROWSE && (
-        <div>
-          <button onClick={loadGames}>Refresh</button>
-          {isLoading && <div>Loading...</div>}
-          {error && <div>Error: {error}</div>}
-          <ul>
-            {games.map((name) => (
-              <li key={name}>
-                <button onClick={() => onJoin(name)}>{name}</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {view === View.CREATE && (
-        <div>
-          <input type="text" value={newName} onInput={onNewNameInput} />
-          <button onClick={onCreateClick} disabled={!canCreate}>Create</button>
-        </div>
-      )}
     </div>
   )
 }
